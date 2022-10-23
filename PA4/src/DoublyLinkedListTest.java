@@ -54,4 +54,8 @@ public class DoublyLinkedListTest {
     @org.junit.Test
     public void add() {
     }
+
+    @Test
+    public void testAdd() {
+    }
 }
