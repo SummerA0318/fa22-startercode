@@ -3,6 +3,7 @@
  * PID: TODO
  */
 
+import javax.annotation.processing.SupportedAnnotationTypes;
 import java.util.AbstractList;
 
 /**
@@ -31,7 +32,9 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * Constructor to create singleton Node
          */
         private Node(T element) {
-            // TODO: complete constructor
+            this.data = element;
+            this.next = null;
+            this.prev = null;
         }
 
         /**
@@ -42,7 +45,9 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * @param prevNode predecessor Node, can be null
          */
         private Node(T element, Node nextNode, Node prevNode) {
-            // TODO: complete implementation
+            this.data = element;
+            this.next = nextNode;
+            this.prev = prevNode;
         }
 
         /**
@@ -51,15 +56,14 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * @param element new element
          */
         public void setElement(T element) {
-            // TODO: complete implementation
+            this.data = element;
         }
 
         /**
          * Accessor to get the Nodes Element
          */
         public T getElement() {
-            // TODO: complete implementation
-            return null;
+            return this.data;
         }
 
         /**
@@ -68,7 +72,7 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * @param n new next node
          */
         public void setNext(Node n) {
-            // TODO: complete implementation
+            this.next = n;
         }
 
         /**
@@ -77,8 +81,7 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * @return the successor node
          */
         public Node getNext() {
-            // TODO: complete implementation
-            return null;
+            return this.next;
         }
 
         /**
@@ -87,7 +90,7 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * @param p new previous node
          */
         public void setPrev(Node p) {
-            // TODO: complete implementation
+            this.prev = p;
         }
 
 
@@ -97,8 +100,7 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * @return predecessor node
          */
         public Node getPrev() {
-            // TODO: complete implementation
-            return null;
+            return this.prev;
         }
 
         /**
@@ -106,7 +108,10 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
          * Update previous and next nodes
          */
         public void remove() {
-            // TODO: complete implementation
+            this.getPrev().setNext(this.getNext());
+            this.getNext().setPrev(this.getPrev());
+            this.setPrev(null);
+            this.setNext(null);
         }
     }
 
@@ -114,7 +119,9 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      * Creates a new, empty doubly-linked list.
      */
     public DoublyLinkedList() {
-        // TODO: complete default constructor
+        this.nelems = 0;
+        this.head = new Node(null);
+        this.tail = new Node(null);
     }
 
     /**
@@ -126,8 +133,13 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      */
     @Override
     public boolean add(T element) throws NullPointerException {
-        // TODO: Implementation for throwing exceptions followed by
-        // implementation of adding the new data
+        if (element == null) {
+            throw new NullPointerException();
+        }
+        Node toAdd = new Node(element, null, this.tail);
+        this.tail.setNext(toAdd);
+        this.tail = toAdd;
+        this.nelems += 1;
         return true;
     }
 
@@ -141,8 +153,21 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
     @Override
     public void add(int index, T element)
             throws IndexOutOfBoundsException, NullPointerException {
-        // TODO: Implementation for throwing exceptions followed by
-        // implementation of adding the new data
+        if (index < 0 || index > this.nelems) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (element == null) {
+            throw new NullPointerException();
+        }
+        Node current = this.head;
+        while (index != 0) {
+            current = current.getNext();
+            index -= 1;
+        }
+        Node toAdd = new Node(element, current, current.getPrev());
+        current.getPrev().setNext(toAdd);
+        current.setPrev(toAdd);
+        this.nelems += 1;
     }
 
     /**
@@ -150,7 +175,12 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      */
     @Override
     public void clear() {
-        // TODO: implement clear
+        for (int i=0; i<this.nelems; i++) {
+            Node current = this.head;
+            this.head = this.head.getNext();
+            current.remove();
+        }
+        this.nelems = 0;
     }
 
     /**
@@ -158,10 +188,17 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      *
      * TODO: Javadoc comments
      */
+    @SuppressWarnings("unchecked")
     @Override
     public boolean contains(Object element) {
         T data = (T)element;
-        // TODO: Fill in implementation
+        Node current = this.head;
+        for (int i=0; i<this.nelems; i++) {
+            if (current.getElement().equals(data)) {
+                return true;
+            }
+            current = current.getNext();
+        }
         return false;
     }
 
@@ -172,8 +209,15 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      */
     @Override
     public T get(int index) throws IndexOutOfBoundsException {
-        // TODO: Fill in implementation to get the node at index
-        return null;
+        if (index < 0 || index >= this.nelems) {
+            throw new IndexOutOfBoundsException();
+        }
+        Node current = this.head;
+        while (index != 0) {
+            current = current.getNext();
+            index -= 1;
+        }
+        return current.getElement();
     }
 
     /**
@@ -182,8 +226,12 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      * TODO: Javadoc comments
      */
     private Node getNth(int index) {
-        // TODO: implement
-        return null;
+        Node current = this.head;
+        while (index != 0) {
+            current = current.getNext();
+            index -= 1;
+        }
+        return current;
     }
 
     /**
@@ -193,8 +241,7 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      */
     @Override
     public boolean isEmpty() {
-        // TODO: implement isEmpty
-        return true;
+        return (this.nelems == 0);
     }
 
     /**
@@ -204,8 +251,18 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      */
     @Override
     public T remove(int index) throws IndexOutOfBoundsException {
-        // TODO: Fill in implementation
-        return null;
+        if (index < 0 || index >= this.nelems) {
+            throw new IndexOutOfBoundsException();
+        }
+        Node current = this.head;
+        while (index != 0) {
+            current = current.getNext();
+            index -= 1;
+        }
+        T data = current.getElement();
+        current.remove();
+        this.nelems -= 1;
+        return data;
     }
 
     /**
@@ -216,8 +273,20 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
     @Override
     public T set(int index, T element)
             throws IndexOutOfBoundsException, NullPointerException {
-        // TODO: Fill in implmentation
-        return null;
+        if (index < 0 || index >= this.nelems) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (element == null) {
+            throw new NullPointerException();
+        }
+        Node current = this.head;
+        while (index != 0) {
+            current = current.getNext();
+            index -= 1;
+        }
+        T data = current.getElement();
+        current.setElement(element);
+        return data;
     }
 
     /**
@@ -227,8 +296,7 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      */
     @Override
     public int size() {
-        // TODO: complete implementation
-        return 0;
+        return this.nelems;
     }
 
     /**
@@ -239,7 +307,15 @@ public class DoublyLinkedList<T> extends AbstractList<T> {
      */
     @Override
     public String toString() {
-        return null;
+        String output = "";
+        String newOutput = "";
+        Node current = this.head;
+        for (int i=0; i<this.nelems; i++) {
+            newOutput = output + current.getElement() + " -> ";
+            output = newOutput;
+            current = current.getNext();
+        }
+        return "(head) -> " + output + "(tail)";
     }
 
     /* ==================== EXTRA CREDIT ==================== */
